@@ -3,186 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bus Simulator BS - Pro</title>
+    <title>Bus Simulator BS - Official</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
-    <style>
-        /* --- PREMIUM GAME CSS --- */
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial', sans-serif; user-select: none; }
-        
-        #game-logo { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); font-size: 26px; font-weight: 900; color: #00ff88; text-shadow: 0 0 15px #00ff88; z-index: 100; letter-spacing: 4px; }
-        
-        #money-ui { position: fixed; top: 15px; right: 15px; background: rgba(0, 0, 0, 0.8); color: #ffcc00; padding: 10px 20px; border-radius: 50px; border: 2px solid #ffcc00; font-weight: bold; font-size: 20px; z-index: 100; box-shadow: 0 0 10px rgba(255, 204, 0, 0.5); }
-
-        .ui-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
-        
-        .controls-container { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-between; padding: 0 25px; box-sizing: border-box; }
-        
-        /* Circular Buttons for Steering & Horn */
-        .btn-circle { width: 70px; height: 70px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.6); border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; pointer-events: auto; cursor: pointer; backdrop-filter: blur(5px); }
-        .btn-circle:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
-
-        /* Pedal Styling */
-        .pedal-box { display: flex; gap: 12px; align-items: flex-end; }
-        .pedal { width: 75px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; pointer-events: auto; text-align: center; font-size: 14px; cursor: pointer; transition: 0.1s; }
-        
-        .hard-brk { background: linear-gradient(#ff3333, #800000); height: 85px; border-bottom: 5px solid #440000; }
-        .normal-brk { background: linear-gradient(#ff9900, #cc6600); height: 110px; border-bottom: 5px solid #663300; }
-        .race-pedal { background: linear-gradient(#00aa00, #005500); height: 140px; border-bottom: 5px solid #003300; }
-        
-        .pedal:active { transform: translateY(5px); border-bottom-width: 0; }
-
-        /* Dance Screen */
-        #dance-screen { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; color: #fff; pointer-events: auto; }
-        .dancer-icon { font-size: 100px; animation: dance-anim 0.5s infinite alternate ease-in-out; }
-        @keyframes dance-anim { from { transform: translateY(0) rotate(-10deg); } to { transform: translateY(-40px) rotate(10deg); } }
-        
-        .return-btn { margin-top: 30px; padding: 15px 45px; background: #00ff88; color: #000; border: none; border-radius: 50px; font-weight: 900; font-size: 20px; cursor: pointer; box-shadow: 0 0 20px #00ff88; }
-
-        #loader { position: fixed; inset: 0; background: #000; color: #00ff88; display: flex; align-items: center; justify-content: center; z-index: 2000; font-size: 24px; font-weight: bold; letter-spacing: 5px; }
-    </style>
 </head>
 <body>
-
-    <div id="loader">LOADING BUS SIMULATOR BS...</div>
+    <div id="loader">BUS SIMULATOR BS LOADING...</div>
     <div id="game-logo">BUS SIMULATOR BS</div>
     <div id="money-ui">💰 $ <span id="balance">1000</span></div>
 
     <div class="ui-overlay">
-        <div style="position: absolute; top: 80px; right: 25px; pointer-events: auto; display: flex; flex-direction: column; gap: 15px;">
-            <div class="btn-circle" onclick="console.log('Horn')">📯</div>
-            <div class="btn-circle" onclick="applyTow()" style="background: rgba(255, 165, 0, 0.4);">🛻</div>
+        <div class="side-controls">
+            <div class="btn-action" onclick="alert('Peee Peee!')">📯</div>
+            <div class="btn-action" onclick="applyTow()" style="background: rgba(255,165,0,0.4);">🛻</div>
         </div>
 
-        <div class="controls-container">
-            <div style="display: flex; gap: 15px;">
-                <div class="btn-circle" id="left">◀</div>
-                <div class="btn-circle" id="right">▶</div>
+        <div class="footer-controls">
+            <div class="steer-group">
+                <div class="btn-action" id="leftBtn">◀</div>
+                <div class="btn-action" id="rightBtn">▶</div>
             </div>
-            
-            <div class="pedal-box">
-                <div class="pedal hard-brk" onclick="startHardBrake()">HARD<br>BRK</div>
-                <div class="pedal normal-brk" id="normalBrk">BRK</div>
-                <div class="pedal race-pedal" id="race">RACE</div>
+            <div class="pedal-group">
+                <div class="pedal h-brk" onclick="startDance()">HARD<br>BRK</div>
+                <div class="pedal n-brk" id="brkBtn">BRK</div>
+                <div class="pedal race-pedal" id="raceBtn">RACE</div>
             </div>
         </div>
     </div>
 
-    <div id="dance-screen">
-        <div class="dancer-icon">🕺</div>
-        <h1 style="color: #ffcc00; font-size: 35px; margin-top: 20px;">DRIVER IS DANCING!</h1>
-        <p>Happiness Bonus: +$10</p>
-        <button class="return-btn" onclick="stopDance()">RESUME DRIVE</button>
+    <div id="dance-mode">
+        <div class="dancer">🕺</div>
+        <h1>DRIVER IS DANCING!</h1>
+        <p>Bonus Received: +$10</p>
+        <button class="resume-btn" onclick="stopDance()">RETURN TO BUS</button>
     </div>
 
-    <script>
-        /* --- GAME ENGINE LOGIC --- */
-        let scene, camera, renderer, bus, wheels = [];
-        let money = 1000, speed = 0, targetSpeed = 0, steerValue = 0;
-        let isDancing = false, isBraking = false;
-
-        function init() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87ceeb);
-            scene.fog = new THREE.Fog(0x87ceeb, 20, 200);
-
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-
-            // Lighting
-            const sun = new THREE.DirectionalLight(0xffffff, 1.2);
-            sun.position.set(10, 20, 10);
-            scene.add(sun, new THREE.AmbientLight(0x707070));
-
-            // Infinite Road
-            const roadGeo = new THREE.PlaneGeometry(20, 10000);
-            const roadMat = new THREE.MeshPhongMaterial({ color: 0x333333 });
-            const road = new THREE.Mesh(roadGeo, roadMat);
-            road.rotation.x = -Math.PI / 2;
-            scene.add(road);
-
-            // Pro Bus Model
-            bus = new THREE.Group();
-            const body = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2.8, 8), new THREE.MeshPhongMaterial({ color: 0x006400 }));
-            body.position.y = 1.8;
-            bus.add(body);
-
-            // Wheels
-            const wheelGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.5, 32);
-            const wheelMat = new THREE.MeshPhongMaterial({ color: 0x111111 });
-            const wPos = [[-1.3,0.5,2.5],[1.3,0.5,2.5],[-1.3,0.5,-2.5],[1.3,0.5,-2.5]];
-            wPos.forEach(p => {
-                const w = new THREE.Mesh(wheelGeo, wheelMat);
-                w.rotation.z = Math.PI/2; w.position.set(p[0], p[1], p[2]);
-                wheels.push(w); bus.add(w);
-            });
-
-            scene.add(bus);
-            camera.position.set(0, 7, 18);
-        }
-
-        // Logic Functions
-        function startHardBrake() {
-            speed = 0; targetSpeed = 0;
-            document.getElementById('dance-screen').style.display = 'flex';
-            isDancing = true;
-        }
-
-        function stopDance() {
-            money += 10; updateMoney();
-            document.getElementById('dance-screen').style.display = 'none';
-            isDancing = false;
-        }
-
-        function applyTow() {
-            if(money >= 50) { money -= 50; updateMoney(); bus.position.x = 0; }
-        }
-
-        function updateMoney() { document.getElementById('balance').innerText = money; }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            if (!isDancing) {
-                if (isBraking) speed *= 0.92;
-                else speed += (targetSpeed - speed) * 0.05;
-
-                bus.position.z -= speed;
-                bus.position.x += steerValue * speed * 5;
-                
-                wheels.forEach(w => w.rotation.x -= speed * 2);
-                
-                camera.position.z = bus.position.z + 18;
-                camera.position.x = bus.position.x * 0.7;
-                camera.lookAt(bus.position);
-            }
-            renderer.render(scene, camera);
-        }
-
-        // Input Setup
-        window.onload = () => {
-            init(); animate();
-            document.getElementById('loader').style.display = 'none';
-            
-            const race = document.getElementById('race'), brk = document.getElementById('normalBrk');
-            race.ontouchstart = () => { targetSpeed = 0.8; isBraking = false; };
-            race.ontouchend = () => targetSpeed = 0;
-            
-            brk.ontouchstart = () => isBraking = true;
-            brk.ontouchend = () => isBraking = false;
-            
-            document.getElementById('left').ontouchstart = () => steerValue = 0.06;
-            document.getElementById('left').ontouchend = () => steerValue = 0;
-            document.getElementById('right').ontouchstart = () => steerValue = -0.06;
-            document.getElementById('right').ontouchend = () => steerValue = 0;
-        };
-
-        window.onresize = () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        };
-    </script>
+    <script src="game.js"></script>
 </body>
 </html>
